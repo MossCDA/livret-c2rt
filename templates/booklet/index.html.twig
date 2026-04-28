@@ -1,5 +1,60 @@
 {% extends 'base.html.twig' %}
 {% block title %}Livrets{% endblock %}
 {% block body %}
-<h1>Livrets</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-journal-text"></i> 
+        {% if is_granted('ROLE_FORMATEUR') %}Tous les livrets{% else %}Mon livret{% endif %}
+    </h1>
+    {% if not is_granted('ROLE_FORMATEUR') %}
+    <a href="{{ path('app_booklet_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Ajouter une semaine
+    </a>
+    {% endif %}
+</div>
+
+{% if booklets is empty %}
+    <div class="alert alert-info">Aucune entrée dans le livret pour l'instant.</div>
+{% else %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                {% if is_granted('ROLE_FORMATEUR') %}<th>Apprenant</th>{% endif %}
+                <th>Semaine</th>
+                <th>Du</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booklet in booklets %}
+            <tr>
+                {% if is_granted('ROLE_FORMATEUR') %}
+                <td>{{ booklet.user ? booklet.user.firstName ~ ' ' ~ booklet.user.lastName : '-' }}</td>
+                {% endif %}
+                <td>Semaine {{ booklet.weekNumber }}</td>
+                <td>{{ booklet.weekStart ? booklet.weekStart|date('d/m/Y') : '-' }}</td>
+                <td>
+                    {% if booklet.validated %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Validé</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> En attente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_booklet_show', {id: booklet.id}) }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    {% if not booklet.validated and booklet.user == app.user %}
+                    <a href="{{ path('app_booklet_edit', {id: booklet.id}) }}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}
