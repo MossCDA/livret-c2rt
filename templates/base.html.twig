@@ -15,18 +15,31 @@
             <a class="navbar-brand fw-bold" href="{{ path('app_dashboard') }}">
                 <i class="bi bi-journal-check"></i> Livret C2RT
             </a>
-            <div class="collapse navbar-collapse">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if is_granted('ROLE_FORMATEUR') %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_admin') }}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                             <i class="bi bi-gear"></i> Administration
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_formation_index') }}">
-                            <i class="bi bi-mortarboard"></i> Formations
-                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_type_formation_index') }}">
+                                <i class="bi bi-award"></i> Titres RNCP
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_formation_index') }}">
+                                <i class="bi bi-mortarboard"></i> Formations
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_user_index') }}">
+                                <i class="bi bi-people"></i> Utilisateurs
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ path('app_vacancy_index') }}">
+                                <i class="bi bi-calendar-x"></i> Vacances
+                            </a></li>
+                        </ul>
                     </li>
                     {% endif %}
                     <li class="nav-item">
