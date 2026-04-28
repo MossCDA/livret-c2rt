@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Form\BookletType;
 use App\Repository\BookletRepository;
 use App\Service\BookletExportService;
+use App\Service\BookletPdfExportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -105,6 +106,14 @@ class BookletController extends AbstractController
     {
         $booklets = $repo->findBy(['user' => $user], ['weekNumber' => 'ASC']);
         return $exportService->exportUserBooklet($user, $booklets);
+    }
+
+    #[Route('/export-pdf/{id}', name: 'app_booklet_export_pdf', methods: ['GET'])]
+    #[IsGranted('ROLE_FORMATEUR')]
+    public function exportPdf(User $user, BookletRepository $repo, BookletPdfExportService $pdfExportService): Response
+    {
+        $booklets = $repo->findBy(['user' => $user], ['weekNumber' => 'ASC']);
+        return $pdfExportService->exportUserBooklet($user, $booklets);
     }
 
     #[Route('/{id}', name: 'app_booklet_delete', methods: ['POST'])]

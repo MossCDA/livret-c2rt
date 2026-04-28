@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 11px; color: #333; }
+        h1 { font-size: 18px; text-align: center; color: #003366; border-bottom: 2px solid #003366; padding-bottom: 8px; }
+        h2 { font-size: 13px; color: #003366; margin-top: 20px; border-left: 4px solid #003366; padding-left: 8px; }
+        .info { text-align: center; color: #666; margin-bottom: 20px; }
+        .semaine { margin-bottom: 25px; page-break-inside: avoid; }
+        .semaine-header { background-color: #003366; color: white; padding: 6px 10px; font-weight: bold; }
+        .semaine-meta { color: #666; font-style: italic; font-size: 10px; padding: 4px 0; }
+        .semaine-content { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; min-height: 60px; }
+        .badge-valide { color: green; font-weight: bold; }
+        .badge-attente { color: orange; font-weight: bold; }
+        .ecf { border: 1px solid #ddd; padding: 6px; margin-top: 8px; background: #fff; }
+        .ecf-a { color: green; font-weight: bold; }
+        .ecf-b { color: orange; font-weight: bold; }
+        .ecf-c { color: red; font-weight: bold; }
+        .bilan { border: 2px solid #003366; padding: 10px; margin-top: 10px; background: #f0f4ff; }
+        .footer { text-align: center; color: #999; font-size: 9px; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 8px; }
+    </style>
+</head>
+<body>
+
+<h1>LIVRET DE SUIVI</h1>
+<div class="info">
+    <strong>{{ user.firstName }} {{ user.lastName }}</strong><br>
+    {% if user.formation %}Formation : {{ user.formation.name }}{% endif %}<br>
+    Généré le {{ "now"|date("d/m/Y") }}
+</div>
+
+{% for booklet in booklets %}
+<div class="semaine">
+    <div class="semaine-header">
+        Semaine {{ booklet.weekNumber }}
+        {% if booklet.weekStart %} — {{ booklet.weekStart|date('d/m/Y') }}{% endif %}
+    </div>
+    <div class="semaine-meta">
+        Statut :
+        {% if booklet.validated %}
+            <span class="badge-valide">✓ Validé le {{ booklet.validatedAt|date('d/m/Y') }}</span>
+        {% else %}
+            <span class="badge-attente">⏳ En attente de validation</span>
+        {% endif %}
+    </div>
+    <div class="semaine-content">
+        {{ booklet.weekContent|nl2br }}
+    </div>
+
+    {% if booklet.ecfs is not empty %}
+    <h2>Évaluations (ECF)</h2>
+    {% for ecf in booklet.ecfs %}
+    <div class="ecf">
+        <span class="ecf-{{ ecf.grade|lower }}">
+            {% if ecf.grade == 'A' %}A — Acquis
+            {% elseif ecf.grade == 'B' %}B — En cours
+            {% else %}C — Non acquis{% endif %}
+        </span>
+        {% if ecf.skill %} | {{ ecf.skill.name }}{% endif %}
+        {% if ecf.comment %}<br>{{ ecf.comment }}{% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if booklet.bilan %}
+    <div class="bilan">
+        <strong>Bilan de fin de formation :</strong><br>
+        {{ booklet.bilan.content|nl2br }}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<div class="footer">
+    C2RT — Centre de formation | Livret généré automatiquement
+</div>
+
+</body>
+</html>

@@ -54,6 +54,9 @@
                     <a href="{{ path('app_booklet_export', {id: booklet.user.id}) }}" class="btn btn-sm btn-dark">
                         <i class="bi bi-file-word"></i> DOCX
                     </a>
+                    <a href="{{ path('app_booklet_export_pdf', {id: booklet.user.id}) }}" class="btn btn-sm btn-danger">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </a>
                     {% endif %}
                 </td>
             </tr>
