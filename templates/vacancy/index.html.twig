@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+{% block title %}Périodes de vacances{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-calendar-x"></i> Périodes de vacances</h1>
+    <a href="{{ path('app_vacancy_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouvelle période
+    </a>
+</div>
+{% if vacancies is empty %}
+    <div class="alert alert-info">Aucune période de vacances définie.</div>
+{% else %}
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr><th>Début</th><th>Fin</th><th>Durée</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for vacancy in vacancies %}
+        <tr>
+            <td>{{ vacancy.beginAt|date('d/m/Y') }}</td>
+            <td>{{ vacancy.endAt|date('d/m/Y') }}</td>
+            <td>{{ vacancy.beginAt|date('U') is not null ? ((vacancy.endAt.timestamp - vacancy.beginAt.timestamp) / 86400)|round ~ ' jours' : '-' }}</td>
+            <td>
+                <a href="{{ path('app_vacancy_edit', {id: vacancy.id}) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <form method="post" action="{{ path('app_vacancy_delete', {id: vacancy.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vacancy.id) }}">
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

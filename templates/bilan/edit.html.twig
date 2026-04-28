@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier bilan{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-award"></i> Modifier bilan</h4>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                    <div class="col-12">{{ form_label(form.content) }}{{ form_widget(form.content) }}</div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning">Modifier</button>
+                        <a href="{{ path('app_booklet_show', {id: bilan.booklet.id}) }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

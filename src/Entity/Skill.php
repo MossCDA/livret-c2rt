@@ -28,9 +28,16 @@ class Skill
     #[ORM\JoinColumn(nullable: false)]
     private ?ActiviteType $activiteType = null;
 
+    /**
+     * @var Collection<int, Ecf>
+     */
+    #[ORM\OneToMany(targetEntity: Ecf::class, mappedBy: 'skill')]
+    private Collection $ecfs;
+
     public function __construct()
     {
         $this->slot = new ArrayCollection();
+        $this->ecfs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,6 +95,36 @@ class Skill
     public function setActiviteType(?ActiviteType $activiteType): static
     {
         $this->activiteType = $activiteType;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ecf>
+     */
+    public function getEcfs(): Collection
+    {
+        return $this->ecfs;
+    }
+
+    public function addEcf(Ecf $ecf): static
+    {
+        if (!$this->ecfs->contains($ecf)) {
+            $this->ecfs->add($ecf);
+            $ecf->setSkill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEcf(Ecf $ecf): static
+    {
+        if ($this->ecfs->removeElement($ecf)) {
+            // set the owning side to null (unless already changed)
+            if ($ecf->getSkill() === $this) {
+                $ecf->setSkill(null);
+            }
+        }
 
         return $this;
     }

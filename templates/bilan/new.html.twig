@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nouveau bilan{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-award"></i> Bilan de fin de formation</h4>
+                <small class="text-muted">
+                    {{ booklet.user ? booklet.user.firstName ~ ' ' ~ booklet.user.lastName : '-' }}
+                    — Semaine {{ booklet.weekNumber }}
+                </small>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                    <div class="col-12">{{ form_label(form.content) }}{{ form_widget(form.content) }}</div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{{ path('app_booklet_show', {id: booklet.id}) }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

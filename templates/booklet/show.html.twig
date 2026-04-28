@@ -10,6 +10,20 @@
             <button class="btn btn-success"><i class="bi bi-check-circle"></i> Valider</button>
         </form>
         {% endif %}
+        {% if is_granted('ROLE_FORMATEUR') %}
+        <a href="{{ path('app_ecf_new', {id: booklet.id}) }}" class="btn btn-primary">
+            <i class="bi bi-clipboard-plus"></i> Ajouter ECF
+        </a>
+        {% if booklet.bilan %}
+        <a href="{{ path('app_bilan_edit', {id: booklet.bilan.id}) }}" class="btn btn-info">
+            <i class="bi bi-award"></i> Modifier bilan
+        </a>
+        {% else %}
+        <a href="{{ path('app_bilan_new', {id: booklet.id}) }}" class="btn btn-info">
+            <i class="bi bi-award"></i> Ajouter bilan
+        </a>
+        {% endif %}
+        {% endif %}
         {% if not booklet.validated and booklet.user == app.user %}
         <a href="{{ path('app_booklet_edit', {id: booklet.id}) }}" class="btn btn-warning">
             <i class="bi bi-pencil"></i> Modifier
@@ -19,22 +33,85 @@
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <span>
-            <strong>{{ booklet.user ? booklet.user.firstName ~ ' ' ~ booklet.user.lastName : '-' }}</strong>
-            — {{ booklet.weekStart ? booklet.weekStart|date('d/m/Y') : '-' }}
-        </span>
-        <span>
-            {% if booklet.validated %}
-                <span class="badge bg-success">Validé le {{ booklet.validatedAt|date('d/m/Y') }}</span>
-            {% else %}
-                <span class="badge bg-warning text-dark">En attente de validation</span>
-            {% endif %}
-        </span>
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>
+                    <strong>{{ booklet.user ? booklet.user.firstName ~ ' ' ~ booklet.user.lastName : '-' }}</strong>
+                    — {{ booklet.weekStart ? booklet.weekStart|date('d/m/Y') : '-' }}
+                </span>
+                <span>
+                    {% if booklet.validated %}
+                        <span class="badge bg-success">Validé le {{ booklet.validatedAt|date('d/m/Y') }}</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">En attente de validation</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                <p style="white-space: pre-wrap;">{{ booklet.weekContent }}</p>
+            </div>
+        </div>
+
+        {% if booklet.bilan %}
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-award"></i> Bilan de fin de formation
+            </div>
+            <div class="card-body">
+                <p style="white-space: pre-wrap;">{{ booklet.bilan.content }}</p>
+                <small class="text-muted">Rédigé le {{ booklet.bilan.createdAt ? booklet.bilan.createdAt|date('d/m/Y') : '-' }}</small>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    <div class="card-body">
-        <p style="white-space: pre-wrap;">{{ booklet.weekContent }}</p>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clipboard-check"></i> Évaluations (ECF)
+            </div>
+            <div class="card-body">
+                {% if booklet.ecfs is empty %}
+                    <p class="text-muted">Aucune évaluation pour cette semaine.</p>
+                {% else %}
+                    {% for ecf in booklet.ecfs %}
+                    <div class="border rounded p-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                {% if ecf.grade == 'A' %}
+                                    <span class="badge bg-success">A — Acquis</span>
+                                {% elseif ecf.grade == 'B' %}
+                                    <span class="badge bg-warning text-dark">B — En cours</span>
+                                {% else %}
+                                    <span class="badge bg-danger">C — Non acquis</span>
+                                {% endif %}
+                            </strong>
+                            {% if is_granted('ROLE_FORMATEUR') %}
+                            <div>
+                                <a href="{{ path('app_ecf_edit', {id: ecf.id}) }}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_ecf_delete', {id: ecf.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ecf.id) }}">
+                                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if ecf.skill %}
+                            <small class="text-muted">{{ ecf.skill.name }}</small><br>
+                        {% endif %}
+                        {% if ecf.comment %}
+                            <p class="mt-1 mb-0">{{ ecf.comment }}</p>
+                        {% endif %}
+                        <small class="text-muted">{{ ecf.evaluatedAt ? ecf.evaluatedAt|date('d/m/Y') : '' }}</small>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

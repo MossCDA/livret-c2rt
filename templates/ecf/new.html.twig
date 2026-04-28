@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nouvelle ECF{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-clipboard-check"></i> Nouvelle évaluation (ECF)</h4>
+                <small class="text-muted">
+                    {{ booklet.user ? booklet.user.firstName ~ ' ' ~ booklet.user.lastName : '-' }}
+                    — Semaine {{ booklet.weekNumber }}
+                </small>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                    <div class="col-md-4">{{ form_label(form.grade) }}{{ form_widget(form.grade) }}</div>
+                    <div class="col-md-8">{{ form_label(form.skill) }}{{ form_widget(form.skill) }}</div>
+                    <div class="col-12">{{ form_label(form.comment) }}{{ form_widget(form.comment) }}</div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{{ path('app_booklet_show', {id: booklet.id}) }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

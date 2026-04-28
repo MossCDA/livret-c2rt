@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BookletRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,6 +44,20 @@ class Booklet
     #[ORM\Column(nullable: true)]
     private ?\DateTime $weekStart = null;
 
+    /**
+     * @var Collection<int, Ecf>
+     */
+    #[ORM\OneToMany(targetEntity: Ecf::class, mappedBy: 'booklet')]
+    private Collection $ecfs;
+
+    #[ORM\OneToOne(mappedBy: 'booklet', cascade: ['persist', 'remove'])]
+    private ?Bilan $bilan = null;
+
+    public function __construct()
+    {
+        $this->ecfs = new ArrayCollection();
+    }
+
     public function getId(): ?int { return $this->id; }
 
     public function isStorage(): ?bool { return $this->storage; }
@@ -70,4 +86,51 @@ class Booklet
 
     public function getWeekStart(): ?\DateTime { return $this->weekStart; }
     public function setWeekStart(?\DateTime $weekStart): static { $this->weekStart = $weekStart; return $this; }
+
+    /**
+     * @return Collection<int, Ecf>
+     */
+    public function getEcfs(): Collection
+    {
+        return $this->ecfs;
+    }
+
+    public function addEcf(Ecf $ecf): static
+    {
+        if (!$this->ecfs->contains($ecf)) {
+            $this->ecfs->add($ecf);
+            $ecf->setBooklet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEcf(Ecf $ecf): static
+    {
+        if ($this->ecfs->removeElement($ecf)) {
+            // set the owning side to null (unless already changed)
+            if ($ecf->getBooklet() === $this) {
+                $ecf->setBooklet(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getBilan(): ?Bilan
+    {
+        return $this->bilan;
+    }
+
+    public function setBilan(Bilan $bilan): static
+    {
+        // set the owning side of the relation if necessary
+        if ($bilan->getBooklet() !== $this) {
+            $bilan->setBooklet($this);
+        }
+
+        $this->bilan = $bilan;
+
+        return $this;
+    }
 }

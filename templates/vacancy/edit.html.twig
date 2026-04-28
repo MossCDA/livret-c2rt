@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier période de vacances{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h4><i class="bi bi-pencil"></i> Modifier période de vacances</h4></div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                    <div class="col-md-6">{{ form_label(form.beginAt) }}{{ form_widget(form.beginAt) }}</div>
+                    <div class="col-md-6">{{ form_label(form.endAt) }}{{ form_widget(form.endAt) }}</div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning">Modifier</button>
+                        <a href="{{ path('app_vacancy_index') }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
