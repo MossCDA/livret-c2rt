@@ -1,20 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello FormationController!{% endblock %}
+{% block title %}Formations{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/Famil/livret-c2rt/src/Controller/FormationController.php</code></li>
-        <li>Your template at <code>C:/Users/Famil/livret-c2rt/templates/formation/index.html.twig</code></li>
-    </ul>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3"><i class="bi bi-mortarboard"></i> Formations</h1>
+    <a href="{{ path('app_formation_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouvelle formation
+    </a>
 </div>
+
+{% if formations is empty %}
+    <div class="alert alert-info">Aucune formation créée pour l'instant.</div>
+{% else %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Titre professionnel</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Apprenants</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for formation in formations %}
+            <tr>
+                <td>{{ formation.name }}</td>
+                <td>{{ formation.typeFormation ? formation.typeFormation.name : '-' }}</td>
+                <td>{{ formation.beginAt ? formation.beginAt|date('d/m/Y') : '-' }}</td>
+                <td>{{ formation.endAt ? formation.endAt|date('d/m/Y') : '-' }}</td>
+                <td>{{ formation.booklets|length }}</td>
+                <td>
+                    <a href="{{ path('app_formation_show', {id: formation.id}) }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{{ path('app_formation_edit', {id: formation.id}) }}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form method="post" action="{{ path('app_formation_delete', {id: formation.id}) }}" style="display:inline" onsubmit="return confirm('Supprimer cette formation ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                        <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}

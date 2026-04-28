@@ -1,20 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DashboardController!{% endblock %}
+{% block title %}Dashboard — Livret C2RT{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/Famil/livret-c2rt/src/Controller/DashboardController.php</code></li>
-        <li>Your template at <code>C:/Users/Famil/livret-c2rt/templates/dashboard/index.html.twig</code></li>
-    </ul>
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="h3">
+            <i class="bi bi-house"></i> Bonjour, {{ app.user.firstName }} !
+        </h1>
+        <p class="text-muted">
+            {% if is_granted('ROLE_FORMATEUR') %}
+                Vous êtes connecté en tant que <strong>formateur</strong>.
+            {% else %}
+                Vous êtes connecté en tant qu'<strong>apprenant</strong>.
+            {% endif %}
+        </p>
+    </div>
 </div>
+
+{% if is_granted('ROLE_FORMATEUR') %}
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-mortarboard fs-1 text-primary"></i>
+                <h5 class="card-title mt-2">Formations</h5>
+                <p class="card-text text-muted">Gérer les titres RNCP et sessions</p>
+                <a href="{{ path('app_formation_index') }}" class="btn btn-primary btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 text-success"></i>
+                <h5 class="card-title mt-2">Apprenants</h5>
+                <p class="card-text text-muted">Gérer les apprenants</p>
+                <a href="{{ path('app_admin') }}" class="btn btn-success btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-journal-text fs-1 text-warning"></i>
+                <h5 class="card-title mt-2">Livrets</h5>
+                <p class="card-text text-muted">Consulter et évaluer les livrets</p>
+                <a href="{{ path('app_booklet_index') }}" class="btn btn-warning btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar3 fs-1 text-info"></i>
+                <h5 class="card-title mt-2">Calendrier</h5>
+                <p class="card-text text-muted">Créneaux, vacances, stages</p>
+                <a href="{{ path('app_admin') }}" class="btn btn-info btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-journal-text fs-1 text-primary"></i>
+                <h5 class="card-title mt-2">Mon livret</h5>
+                <p class="card-text text-muted">Remplir mon suivi hebdomadaire</p>
+                <a href="{{ path('app_booklet_index') }}" class="btn btn-primary btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar3 fs-1 text-success"></i>
+                <h5 class="card-title mt-2">Mon calendrier</h5>
+                <p class="card-text text-muted">Voir mon planning de formation</p>
+                <a href="#" class="btn btn-success btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-award fs-1 text-info"></i>
+                <h5 class="card-title mt-2">Mes évaluations</h5>
+                <p class="card-text text-muted">Consulter mes ECF et bilans</p>
+                <a href="#" class="btn btn-info btn-sm">Accéder</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

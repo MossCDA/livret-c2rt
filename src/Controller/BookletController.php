@@ -4,15 +4,16 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-final class BookletController extends AbstractController
+#[Route('/booklet')]
+class BookletController extends AbstractController
 {
-    #[Route('/booklet', name: 'app_booklet')]
+    #[Route('/', name: 'app_booklet_index')]
+    #[IsGranted('ROLE_USER')]
     public function index(): Response
     {
-        return $this->render('booklet/index.html.twig', [
-            'controller_name' => 'BookletController',
-        ]);
+        return $this->render('booklet/index.html.twig');
     }
 }
