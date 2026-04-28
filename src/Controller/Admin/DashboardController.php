@@ -13,6 +13,10 @@ use App\Entity\Slot;
 use App\Entity\TypeFormation;
 use App\Entity\User;
 use App\Entity\Vacancy;
+use App\Repository\FormationRepository;
+use App\Repository\BookletRepository;
+use App\Repository\UserRepository;
+use App\Repository\EcfRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -21,16 +25,33 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(
+        private FormationRepository $formationRepo,
+        private BookletRepository $bookletRepo,
+        private UserRepository $userRepo,
+        private EcfRepository $ecfRepo,
+    ) {}
+
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        return parent::index();
+        $stats = [
+            'formations' => $this->formationRepo->count([]),
+            'livrets'    => $this->bookletRepo->count([]),
+            'users'      => $this->userRepo->count([]),
+            'ecf'        => $this->ecfRepo->count([]),
+        ];
+
+        return $this->render('admin/dashboard.html.twig', [
+            'stats' => $stats,
+        ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Livret C2RT');
+            ->setTitle('Livret C2RT')
+            ->setFaviconPath('favicon.ico');
     }
 
     public function configureMenuItems(): iterable
