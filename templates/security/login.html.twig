@@ -1,7 +1,6 @@
-
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion — Livret C2RT{% endblock %}
+{% block title %}Connexion - Livret C2RT{% endblock %}
 
 {% block body %}
 <div class="row justify-content-center mt-5">
@@ -9,40 +8,35 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white text-center py-3">
                 <h4 class="mb-0"><i class="bi bi-journal-check"></i> Livret C2RT</h4>
-                <small>Connectez-vous à votre espace</small>
+                <small>Connectez-vous a votre espace</small>
             </div>
             <div class="card-body p-4">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
-
                 <form method="post">
                     <div class="mb-3">
                         <label for="inputEmail" class="form-label">Email</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" id="inputEmail" name="_username" class="form-control"
+                            <input type="email" id="inputEmail" name="email" class="form-control"
                                 value="{{ last_username }}" autocomplete="email" required autofocus
                                 placeholder="votre@email.fr">
                         </div>
                     </div>
-
                     <div class="mb-3">
                         <label for="inputPassword" class="form-label">Mot de passe</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                            <input type="password" id="inputPassword" name="_password" class="form-control"
+                            <input type="password" id="inputPassword" name="password" class="form-control"
                                 autocomplete="current-password" required placeholder="••••••••">
                         </div>
                     </div>
-
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
                         <label class="form-check-label" for="remember_me">Se souvenir de moi</label>
                     </div>
-
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-box-arrow-in-right"></i> Se connecter
@@ -51,7 +45,7 @@
                 </form>
             </div>
             <div class="card-footer text-center text-muted py-3">
-                <small>C2RT — Centre de formation</small>
+                <small>C2RT - Centre de formation</small>
             </div>
         </div>
     </div>
