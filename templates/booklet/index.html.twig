@@ -50,6 +50,11 @@
                         <i class="bi bi-pencil"></i>
                     </a>
                     {% endif %}
+                    {% if is_granted('ROLE_FORMATEUR') and booklet.user %}
+                    <a href="{{ path('app_booklet_export', {id: booklet.user.id}) }}" class="btn btn-sm btn-dark">
+                        <i class="bi bi-file-word"></i> DOCX
+                    </a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

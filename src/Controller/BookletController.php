@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Booklet;
+use App\Entity\User;
 use App\Form\BookletType;
 use App\Repository\BookletRepository;
+use App\Service\BookletExportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +72,7 @@ class BookletController extends AbstractController
         }
 
         if ($booklet->isValidated()) {
-            $this->addFlash('error', 'Ce livret a été validé par le formateur, il ne peut plus être modifié.');
+            $this->addFlash('error', 'Ce livret a été validé, il ne peut plus être modifié.');
             return $this->redirectToRoute('app_booklet_index');
         }
 
@@ -95,6 +97,14 @@ class BookletController extends AbstractController
         $em->flush();
         $this->addFlash('success', 'Livret validé.');
         return $this->redirectToRoute('app_booklet_show', ['id' => $booklet->getId()]);
+    }
+
+    #[Route('/export/{id}', name: 'app_booklet_export', methods: ['GET'])]
+    #[IsGranted('ROLE_FORMATEUR')]
+    public function export(User $user, BookletRepository $repo, BookletExportService $exportService): Response
+    {
+        $booklets = $repo->findBy(['user' => $user], ['weekNumber' => 'ASC']);
+        return $exportService->exportUserBooklet($user, $booklets);
     }
 
     #[Route('/{id}', name: 'app_booklet_delete', methods: ['POST'])]
