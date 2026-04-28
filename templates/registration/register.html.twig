@@ -1,19 +1,78 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription — Livret C2RT{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center py-3">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Créer un compte</h4>
+                <small>Rejoignez le Livret C2RT</small>
+            </div>
+            <div class="card-body p-4">
+                {{ form_errors(registrationForm) }}
 
-    {{ form_errors(registrationForm) }}
+                {{ form_start(registrationForm, {'attr': {'class': 'row g-3'}}) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                    <div class="col-md-6">
+                        <label class="form-label">Prénom</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="registration_form[firstName]" class="form-control" placeholder="Prénom">
+                        </div>
+                    </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                    <div class="col-md-6">
+                        <label class="form-label">Nom</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="registration_form[lastName]" class="form-control" placeholder="Nom">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        {{ form_label(registrationForm.email) }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'votre@email.fr'}}) }}
+                        </div>
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+
+                    <div class="col-12">
+                        {{ form_label(registrationForm.plainPassword) }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': '••••••••'}}) }}
+                        </div>
+                        {{ form_errors(registrationForm.plainPassword) }}
+                    </div>
+
+                    <div class="col-12">
+                        {{ form_widget(registrationForm.agreeTerms) }}
+                        {{ form_label(registrationForm.agreeTerms) }}
+                        {{ form_errors(registrationForm.agreeTerms) }}
+                    </div>
+
+                    <div class="col-12 d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-person-check"></i> Créer mon compte
+                        </button>
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <a href="{{ path('app_login') }}" class="text-muted">
+                            <small>Déjà un compte ? Se connecter</small>
+                        </a>
+                    </div>
+
+                {{ form_end(registrationForm) }}
+            </div>
+            <div class="card-footer text-center text-muted py-3">
+                <small>C2RT — Centre de formation</small>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
