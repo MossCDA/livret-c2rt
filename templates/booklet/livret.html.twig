@@ -1,0 +1,340 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livret de suivi - {{ stagiaire.firstName }} {{ stagiaire.lastName }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .livret-container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+
+    .livret-header {
+        background: #1e3a5f;
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    .livret-header h1 { font-size: 1.5rem; margin: 0 0 0.5rem 0; }
+    .livret-header .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.9rem; opacity: 0.85; }
+
+    .fiche {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    .fiche-header {
+        background: #1e3a5f;
+        color: white;
+        padding: 0.75rem 1.25rem;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .fiche-body { padding: 1.25rem; }
+
+    .semaine-header {
+        background: #e8f0fe;
+        border: 1px solid #c5d5f5;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: #1e3a5f;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .semaine-content { margin-bottom: 1.5rem; }
+
+    .skill-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.5rem; }
+    .skill-table th { background: #f8f9fa; padding: 0.5rem; border: 1px solid #dee2e6; text-align: left; }
+    .skill-table td { padding: 0.4rem 0.5rem; border: 1px solid #dee2e6; vertical-align: middle; }
+    .skill-table tr:hover td { background: #f8f9fa; }
+
+    .status-btn { display: inline-flex; gap: 0.3rem; }
+    .status-btn label {
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 2px solid transparent;
+        transition: all 0.15s;
+    }
+    .status-btn input[type=radio] { display: none; }
+    .status-btn input[value="A"]:checked + label { background: #d4edda; border-color: #28a745; color: #155724; }
+    .status-btn input[value="NA"]:checked + label { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+    .status-btn input[value="AT"]:checked + label { background: #fff3cd; border-color: #ffc107; color: #856404; }
+    .status-btn label:hover { opacity: 0.8; border-color: #aaa; }
+    label[for*="_A"] { background: #f0fff0; }
+    label[for*="_NA"] { background: #fff0f0; }
+    label[for*="_AT"] { background: #fffce0; }
+
+    .behavior-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .behavior-table th { background: #f8f9fa; padding: 0.5rem; border: 1px solid #dee2e6; text-align: center; }
+    .behavior-table td { padding: 0.4rem 0.5rem; border: 1px solid #dee2e6; }
+    .behavior-table .criteria-col { width: 40%; }
+
+    .rating-select { font-size: 0.8rem; padding: 0.2rem; border-radius: 4px; border: 1px solid #ced4da; width: 100%; }
+
+    .sticky-save {
+        position: sticky;
+        bottom: 1rem;
+        text-align: center;
+        z-index: 100;
+        margin-top: 1rem;
+    }
+    .sticky-save button {
+        padding: 0.75rem 3rem;
+        font-size: 1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .nav-semaines {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.5rem;
+    }
+    .nav-semaines a {
+        padding: 0.3rem 0.6rem;
+        background: #e8f0fe;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        color: #1e3a5f;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .nav-semaines a:hover { background: #1e3a5f; color: white; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="livret-container">
+
+    <div class="livret-header">
+        <h1><i class="bi bi-journal-check"></i> Livret de suivi du stagiaire</h1>
+        <div class="meta">
+            <span><i class="bi bi-person"></i> {{ stagiaire.firstName }} {{ stagiaire.lastName }}</span>
+            <span><i class="bi bi-mortarboard"></i> {% if formation %}{{ formation.name }}{% else %}N/A{% endif %}</span>
+            <span><i class="bi bi-person-badge"></i> Formateur : {{ app.user.firstName }} {{ app.user.lastName }}</span>
+            {% if formation and formation.beginAt %}
+            <span><i class="bi bi-calendar"></i> {{ formation.beginAt|date('d/m/Y') }} → {{ formation.endAt|date('d/m/Y') }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('livret') }}">
+
+        {# NAVIGATION RAPIDE #}
+        {% if allWeeks|length > 0 %}
+        <div class="nav-semaines">
+            {% for week in allWeeks %}
+            <a href="#semaine-{{ week.id }}">S{{ week.weekNumber }}</a>
+            {% endfor %}
+            <a href="#fiche-visite">Visite</a>
+            <a href="#fiche-savoiretre">Savoir-être</a>
+        </div>
+        {% endif %}
+
+        {# FICHE 2 - PROGRESSION PAR SEMAINE #}
+        <div class="fiche">
+            <div class="fiche-header">
+                <i class="bi bi-calendar-week"></i> Fiche 2 — Progression de la formation au centre
+            </div>
+            <div class="fiche-body">
+                {% if allWeeks|length == 0 %}
+                    <p class="text-muted">Aucune semaine enregistree pour ce stagiaire.</p>
+                {% endif %}
+
+                {% for week in allWeeks %}
+                <div class="semaine-content" id="semaine-{{ week.id }}">
+                    <div class="semaine-header">
+                        <span>Semaine {{ week.weekNumber }}{% if week.weekStart %} — {{ week.weekStart|date('d/m/Y') }}{% endif %}</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description des travaux realises / modules :</label>
+                        <textarea name="week_content[{{ week.id }}]" class="form-control" rows="3">{{ week.weekContent }}</textarea>
+                    </div>
+
+                    <table class="skill-table">
+                        <thead>
+                            <tr>
+                                <th style="width:55%">Savoir-faire CDA</th>
+                                <th style="width:20%">A / NA / AT</th>
+                                <th>Commentaire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for skill in skills %}
+                            {% set assessment = null %}
+                            {% for a in week.skillAssessments %}
+                                {% if a.skill.id == skill.id %}
+                                    {% set assessment = a %}
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td>{{ skill.name }}</td>
+                                <td>
+                                    <div class="status-btn">
+                                        {% set uid = 'sk_' ~ week.id ~ '_' ~ skill.id %}
+                                        <input type="radio" name="skill[{{ week.id }}][{{ skill.id }}][status]" id="{{ uid }}_A" value="A" {% if assessment and assessment.status == 'A' %}checked{% endif %}>
+                                        <label for="{{ uid }}_A">A</label>
+                                        <input type="radio" name="skill[{{ week.id }}][{{ skill.id }}][status]" id="{{ uid }}_NA" value="NA" {% if assessment and assessment.status == 'NA' %}checked{% elseif not assessment %}checked{% endif %}>
+                                        <label for="{{ uid }}_NA">NA</label>
+                                        <input type="radio" name="skill[{{ week.id }}][{{ skill.id }}][status]" id="{{ uid }}_AT" value="AT" {% if assessment and assessment.status == 'AT' %}checked{% endif %}>
+                                        <label for="{{ uid }}_AT">AT</label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text" name="skill[{{ week.id }}][{{ skill.id }}][comment]" class="form-control form-control-sm" value="{{ assessment ? assessment.comment : '' }}" placeholder="Commentaire...">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {# Suivi entreprise pour cette semaine #}
+                    {% set progress = week.companyProgress.first() %}
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <strong><i class="bi bi-building"></i> Suivi en entreprise (semaine {{ week.weekNumber }})</strong>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <label class="form-label small">Date</label>
+                                <input type="date" name="company_progress[{{ week.id }}][date]" class="form-control form-control-sm" value="{{ progress and progress.date ? progress.date|date('Y-m-d') : '' }}">
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label small">Travaux realises / Observations</label>
+                                <textarea name="company_progress[{{ week.id }}][observations]" class="form-control form-control-sm" rows="2">{{ progress ? progress.observations : '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# FICHE 4 - VISITE EN ENTREPRISE #}
+        {% set visit = booklet.companyVisits.first() %}
+        <div class="fiche" id="fiche-visite">
+            <div class="fiche-header">
+                <i class="bi bi-building-check"></i> Fiche 4 — Compte-rendu de visite en entreprise
+            </div>
+            <div class="fiche-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Formateur qui effectue la visite</label>
+                        <input type="text" name="visit[trainerName]" class="form-control" value="{{ visit ? visit.trainerName : '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Date de visite</label>
+                        <input type="date" name="visit[visitDate]" class="form-control" value="{{ visit and visit.visitDate ? visit.visitDate|date('Y-m-d') : '' }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Commentaires du stagiaire et appreciation generale</label>
+                    <textarea name="visit[studentComments]" class="form-control" rows="4">{{ visit ? visit.studentComments : '' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Commentaires du tuteur d'entreprise</label>
+                    <textarea name="visit[tutorComments]" class="form-control" rows="4">{{ visit ? visit.tutorComments : '' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Impressions generales du formateur</label>
+                    <textarea name="visit[trainerComments]" class="form-control" rows="4">{{ visit ? visit.trainerComments : '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        {# FICHE 5 - SAVOIR-ETRE #}
+        {% set criterias = [
+            'Respecter les horaires et la duree du travail',
+            'Etre assidu',
+            'Se presenter dans une tenue vestimentaire compatible',
+            'S\'integrer a l\'equipe',
+            'Respect des consignes de securite',
+            'Rendre compte de son travail',
+            'Faire preuve de motivation',
+            'A un comportement agreable',
+            'Sait accepter la hierarchie',
+            'Fait des efforts pour surmonter les difficultes',
+            'Faire preuve de maitrise et de calme',
+            'Agir de facon organisee et methodique',
+            'Respecter les regles et consignes de travail',
+            'Respecter le materiel et l\'environnement technique'
+        ] %}
+
+        <div class="fiche" id="fiche-savoiretre">
+            <div class="fiche-header">
+                <i class="bi bi-person-check"></i> Fiche 5 — Savoir-etre
+            </div>
+            <div class="fiche-body">
+                {% for period, periodLabel in {'mid': 'Milieu de formation', 'end': 'Fin de formation'} %}
+                <h6 class="fw-bold mb-3 mt-{{ loop.first ? '0' : '4' }}">{{ periodLabel }}</h6>
+                <table class="behavior-table">
+                    <thead>
+                        <tr>
+                            <th class="criteria-col text-start">Critere</th>
+                            <th colspan="3">Auto-evaluation stagiaire</th>
+                            <th colspan="3">Evaluation formateur</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>A travailler</th><th>Satisfaisant</th><th>Tres bien</th>
+                            <th>A travailler</th><th>Satisfaisant</th><th>Tres bien</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for criteria in criterias %}
+                         {% set keyStudent = period ~ '_student_' ~ loop.index %}
+{% set keyTrainer = period ~ '_trainer_' ~ loop.index %}
+
+                        {# Chercher les evaluations existantes #}
+                        {% set ratingStudent = null %}
+                        {% set ratingTrainer = null %}
+                        {% for b in booklet.behaviorAssessments %}
+                            {% if b.period == period and b.assessedBy == 'student' and b.criteria == criteria %}
+                                {% set ratingStudent = b.rating %}
+                            {% endif %}
+                            {% if b.period == period and b.assessedBy == 'trainer' and b.criteria == criteria %}
+                                {% set ratingTrainer = b.rating %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <tr>
+                            <td>{{ criteria }}</td>
+                            {% for val in ['to_work', 'satisfactory', 'very_good'] %}
+                            <td class="text-center">
+                                <input type="radio" name="behavior[{{ keyStudent }}]" value="{{ val }}" {% if ratingStudent == val %}checked{% endif %}>
+                            </td>
+                            {% endfor %}
+                            {% for val in ['to_work', 'satisfactory', 'very_good'] %}
+                            <td class="text-center">
+                                <input type="radio" name="behavior[{{ keyTrainer }}]" value="{{ val }}" {% if ratingTrainer == val %}checked{% endif %}>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="sticky-save">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-save"></i> Sauvegarder le livret
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
