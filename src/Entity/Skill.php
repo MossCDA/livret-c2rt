@@ -34,10 +34,17 @@ class Skill
     #[ORM\OneToMany(targetEntity: Ecf::class, mappedBy: 'skill')]
     private Collection $ecfs;
 
+    /**
+     * @var Collection<int, SkillAssessment>
+     */
+    #[ORM\OneToMany(targetEntity: SkillAssessment::class, mappedBy: 'skill', orphanRemoval: true)]
+    private Collection $skillAssessments;
+
     public function __construct()
     {
         $this->slot = new ArrayCollection();
         $this->ecfs = new ArrayCollection();
+        $this->skillAssessments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -123,6 +130,36 @@ class Skill
             // set the owning side to null (unless already changed)
             if ($ecf->getSkill() === $this) {
                 $ecf->setSkill(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SkillAssessment>
+     */
+    public function getSkillAssessments(): Collection
+    {
+        return $this->skillAssessments;
+    }
+
+    public function addSkillAssessment(SkillAssessment $skillAssessment): static
+    {
+        if (!$this->skillAssessments->contains($skillAssessment)) {
+            $this->skillAssessments->add($skillAssessment);
+            $skillAssessment->setSkill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSkillAssessment(SkillAssessment $skillAssessment): static
+    {
+        if ($this->skillAssessments->removeElement($skillAssessment)) {
+            // set the owning side to null (unless already changed)
+            if ($skillAssessment->getSkill() === $this) {
+                $skillAssessment->setSkill(null);
             }
         }
 

@@ -53,9 +53,37 @@ class Booklet
     #[ORM\OneToOne(mappedBy: 'booklet', cascade: ['persist', 'remove'])]
     private ?Bilan $bilan = null;
 
+    /**
+     * @var Collection<int, SkillAssessment>
+     */
+    #[ORM\OneToMany(targetEntity: SkillAssessment::class, mappedBy: 'booklet', orphanRemoval: true)]
+    private Collection $skillAssessments;
+
+    /**
+     * @var Collection<int, CompanyProgress>
+     */
+    #[ORM\OneToMany(targetEntity: CompanyProgress::class, mappedBy: 'booklet', orphanRemoval: true)]
+    private Collection $companyProgress;
+
+    /**
+     * @var Collection<int, CompanyVisit>
+     */
+    #[ORM\OneToMany(targetEntity: CompanyVisit::class, mappedBy: 'booklet', orphanRemoval: true)]
+    private Collection $companyVisits;
+
+    /**
+     * @var Collection<int, BehaviorAssessment>
+     */
+    #[ORM\OneToMany(targetEntity: BehaviorAssessment::class, mappedBy: 'booklet', orphanRemoval: true)]
+    private Collection $behaviorAssessments;
+
     public function __construct()
     {
         $this->ecfs = new ArrayCollection();
+        $this->skillAssessments = new ArrayCollection();
+        $this->companyProgress = new ArrayCollection();
+        $this->companyVisits = new ArrayCollection();
+        $this->behaviorAssessments = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -130,6 +158,126 @@ class Booklet
         }
 
         $this->bilan = $bilan;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SkillAssessment>
+     */
+    public function getSkillAssessments(): Collection
+    {
+        return $this->skillAssessments;
+    }
+
+    public function addSkillAssessment(SkillAssessment $skillAssessment): static
+    {
+        if (!$this->skillAssessments->contains($skillAssessment)) {
+            $this->skillAssessments->add($skillAssessment);
+            $skillAssessment->setBooklet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSkillAssessment(SkillAssessment $skillAssessment): static
+    {
+        if ($this->skillAssessments->removeElement($skillAssessment)) {
+            // set the owning side to null (unless already changed)
+            if ($skillAssessment->getBooklet() === $this) {
+                $skillAssessment->setBooklet(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompanyProgress>
+     */
+    public function getCompanyProgress(): Collection
+    {
+        return $this->companyProgress;
+    }
+
+    public function addCompanyProgress(CompanyProgress $companyProgress): static
+    {
+        if (!$this->companyProgress->contains($companyProgress)) {
+            $this->companyProgress->add($companyProgress);
+            $companyProgress->setBooklet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompanyProgress(CompanyProgress $companyProgress): static
+    {
+        if ($this->companyProgress->removeElement($companyProgress)) {
+            // set the owning side to null (unless already changed)
+            if ($companyProgress->getBooklet() === $this) {
+                $companyProgress->setBooklet(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompanyVisit>
+     */
+    public function getCompanyVisits(): Collection
+    {
+        return $this->companyVisits;
+    }
+
+    public function addCompanyVisit(CompanyVisit $companyVisit): static
+    {
+        if (!$this->companyVisits->contains($companyVisit)) {
+            $this->companyVisits->add($companyVisit);
+            $companyVisit->setBooklet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompanyVisit(CompanyVisit $companyVisit): static
+    {
+        if ($this->companyVisits->removeElement($companyVisit)) {
+            // set the owning side to null (unless already changed)
+            if ($companyVisit->getBooklet() === $this) {
+                $companyVisit->setBooklet(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BehaviorAssessment>
+     */
+    public function getBehaviorAssessments(): Collection
+    {
+        return $this->behaviorAssessments;
+    }
+
+    public function addBehaviorAssessment(BehaviorAssessment $behaviorAssessment): static
+    {
+        if (!$this->behaviorAssessments->contains($behaviorAssessment)) {
+            $this->behaviorAssessments->add($behaviorAssessment);
+            $behaviorAssessment->setBooklet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBehaviorAssessment(BehaviorAssessment $behaviorAssessment): static
+    {
+        if ($this->behaviorAssessments->removeElement($behaviorAssessment)) {
+            // set the owning side to null (unless already changed)
+            if ($behaviorAssessment->getBooklet() === $this) {
+                $behaviorAssessment->setBooklet(null);
+            }
+        }
 
         return $this;
     }
